@@ -1,12 +1,13 @@
-# OS / Office lock files
+# OS / Office
 Thumbs.db
 Desktop.ini
 ~$*
 *.tmp
+.DS_Store
 
-# Python helper scripts (optional local)
+# Python
 **/__pycache__/
 *.pyc
 
-# Large local-only caches
-.DS_Store
+# Local drafts (not for the shared QMS repo)
+_local_ai_drafts/
