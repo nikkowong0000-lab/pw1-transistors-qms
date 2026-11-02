@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PW1 Skills · Mahara 證據清單</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f1c24;
+      --ink-soft: #3a4d58;
+      --paper: #f3f6f4;
+      --mint: #1f7a63;
+      --mint-deep: #145544;
+      --sand: #d9e4dc;
+      --amber: #c47a22;
+      --line: rgba(15, 28, 36, 0.12);
+      --nav-h: 56px;
+      --max: 820px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Instrument Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(900px 400px at 0% 0%, #cfe8dc 0%, transparent 50%),
+        linear-gradient(180deg, #eef3f0, var(--paper));
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: var(--mint-deep); }
+    .top {
+      position: sticky; top: 0; z-index: 20;
+      height: var(--nav-h);
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0 1.25rem;
+      backdrop-filter: blur(10px);
+      background: rgba(243,246,244,0.9);
+      border-bottom: 1px solid var(--line);
+      font-size: 0.9rem; font-weight: 600;
+    }
+    .top a { text-decoration: none; color: var(--ink-soft); font-weight: 500; font-size: 0.82rem; }
+    main { max-width: var(--max); margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      letter-spacing: -0.02em; margin-bottom: 0.5rem;
+    }
+    .lede { color: var(--ink-soft); margin-bottom: 1.25rem; max-width: 40rem; }
+    .jump { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+    .jump a {
+      text-decoration: none; font-size: 0.75rem; font-weight: 600;
+      padding: 0.35rem 0.6rem; border-radius: 7px;
+      background: #fff; border: 1px solid var(--line); color: var(--ink-soft);
+    }
+    .card {
+      margin: 1.25rem 0 0;
+      padding: 1.15rem 1.1rem 1.25rem;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      scroll-margin-top: calc(var(--nav-h) + 10px);
+    }
+    .card h2 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.2rem; margin-bottom: 0.35rem;
+    }
+    .meta { font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 0.75rem; }
+    .badge {
+      display: inline-block; font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 0.2rem 0.45rem; border-radius: 5px;
+      background: var(--mint); color: #fff; margin-right: 0.35rem;
+    }
+    .badge.solo { background: var(--amber); }
+    .badge.group { background: #3a5a6e; }
+    ol.req { list-style: none; counter-reset: r; display: grid; gap: 0.4rem; }
+    ol.req li {
+      display: grid; grid-template-columns: auto auto 1fr;
+      gap: 0.5rem; align-items: start;
+      padding: 0.55rem 0.7rem;
+      background: rgba(243,246,244,0.9);
+      border: 1px solid var(--line); border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    ol.req li::before {
+      counter-increment: r; content: counter(r);
+      width: 1.25rem; height: 1.25rem; border-radius: 50%;
+      background: var(--sand); color: var(--mint-deep);
+      font-size: 0.7rem; font-weight: 700;
+      display: grid; place-items: center; margin-top: 0.12rem;
+    }
+    ol.req input { margin-top: 0.2rem; accent-color: var(--mint); width: 1rem; height: 1rem; }
+    .tip {
+      margin-top: 0.7rem; font-size: 0.85rem; color: var(--ink-soft);
+      padding: 0.55rem 0.7rem; border-radius: 8px;
+      background: rgba(31,122,99,0.07); border: 1px solid rgba(31,122,99,0.18);
+    }
+    .tip strong { color: var(--mint-deep); }
+    footer { margin-top: 2rem; font-size: 0.8rem; color: var(--ink-soft); }
+    @media print {
+      .top { position: static; }
+      .card { break-inside: avoid; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <span>PW1 · Skills 清單</span>
+    <a href="index.html#skills">← 回完整指南</a>
+  </div>
+  <main>
+    <h1>六項 Application 技能 · 必做勾選</h1>
+    <p class="lede">來源：官方 <em>Professional and sustainable engineering Skills</em> 頁。全部跟 Mahara 模板欄位對齊。勾選狀態存在本機瀏覽器。</p>
+    <nav class="jump">
+      <a href="#ce">Circular economy</a>
+      <a href="#sc">Communication</a>
+      <a href="#tl">Leadership</a>
+      <a href="#pm">Project mgmt</a>
+      <a href="#tm">Time mgmt</a>
+      <a href="#qm">QMS</a>
+    </nav>
+
+    <article class="card" id="ce">
+      <h2>Engineering design for circular economy</h2>
+      <p class="meta"><span class="badge">Application</span><span class="badge group">模板三題</span> 產出：4R＋技術、LCA／CO₂、金錢價值</p>
+      <ol class="req">
+        <li><input type="checkbox" id="s-ce1" /><label for="s-ce1">選課堂 4 種設計流程之一（或自選＋可靠引用）</label></li>
+        <li><input type="checkbox" id="s-ce2" /><label for="s-ce2">標出對應的 R（可只選部分）</label></li>
+        <li><input type="checkbox" id="s-ce3" /><label for="s-ce3">每個 R：寫技術／決策／製程如何實現它</label></li>
+        <li><input type="checkbox" id="s-ce4" /><label for="s-ce4">描述生命週期各階段</label></li>
+        <li><input type="checkbox" id="s-ce5" /><label for="s-ce5">評估各階段衝擊（課堂 CO₂／PCB 論文／永續軟體資料）</label></li>
+        <li><input type="checkbox" id="s-ce6" /><label for="s-ce6">加總為整體衝擊</label></li>
+        <li><input type="checkbox" id="s-ce7" /><label for="s-ce7">說明金錢價值來源（節流、營收、效率、就業、市值、風險緩解）</label></li>
+      </ol>
+      <p class="tip"><strong>提示：</strong>三題都要完整；R 與技術手段一一對應。</p>
+    </article>
+
+    <article class="card" id="sc">
+      <h2>Scientific communication to a non-technical audience</h2>
+      <p class="meta"><span class="badge">Application</span><span class="badge solo">個人</span> ≤3 分鐘影片；周四結束前 Moodle；Mahara 模板；向「病人」講結構／特性／應用＋USP</p>
+      <ol class="req">
+        <li><input type="checkbox" id="s-sc1" /><label for="s-sc1">開頭講清主題與目的；突出 USP</label></li>
+        <li><input type="checkbox" id="s-sc2" /><label for="s-sc2">引入→展開→限時結論</label></li>
+        <li><input type="checkbox" id="s-sc3" /><label for="s-sc3">全程對準「向病人推廣」；用 annotations</label></li>
+        <li><input type="checkbox" id="s-sc4" /><label for="s-sc4">口語清楚、穩、有自信；少 filler</label></li>
+        <li><input type="checkbox" id="s-sc5" /><label for="s-sc5">對鏡頭眼神接觸；自然手勢；勿照念</label></li>
+        <li><input type="checkbox" id="s-sc6" /><label for="s-sc6">≤ 3 分鐘</label></li>
+        <li><input type="checkbox" id="s-sc7" /><label for="s-sc7">視覺清楚、留白、字級一致、少塞字</label></li>
+      </ol>
+      <p class="tip"><strong>提示：</strong>技術翻成病人聽得懂的話；Moodle＋Mahara 都要放。</p>
+    </article>
+
+    <article class="card" id="tl">
+      <h2>Team Leadership</h2>
+      <p class="meta"><span class="badge">Application</span><span class="badge group">組＋個人</span> Charter＋Skills matrix；個人 CwC 兩段各 50–100 字或 1 分鐘影音</p>
+      <ol class="req">
+        <li><input type="checkbox" id="s-tl1" /><label for="s-tl1">Team charter：目標、分工、誤期／不均、溝通、決策、全員簽名（講義模板）</label></li>
+        <li><input type="checkbox" id="s-tl2" /><label for="s-tl2">Skills matrix：技能、缺口、分工影響、貢獻機會、發展機會（同 Y1）→ <a href="qms/Human%20resources/PW1_Skills_Matrix.xlsx">PW1_Skills_Matrix.xlsx</a></label></li>
+        <li><input type="checkbox" id="s-tl3" /><label for="s-tl3">個人：Controversy with Civility 流程 50–100 字或 1 分鐘</label></li>
+        <li><input type="checkbox" id="s-tl4" /><label for="s-tl4">個人：流程成效反思 50–100 字或 1 分鐘</label></li>
+      </ol>
+      <p class="tip"><strong>提示：</strong>兩段個人證據勿抄組員。</p>
+    </article>
+
+    <article class="card" id="pm">
+      <h2>Advanced project management</h2>
+      <p class="meta"><span class="badge">Application</span><span class="badge group">Mahara 七欄</span> Aims／Scope 50–100；Objective 各 20–50＋SMART；≥2 WP</p>
+      <ol class="req">
+        <li><input type="checkbox" id="s-pm1" /><label for="s-pm1">Aims 50–100：技術＋教育目的</label></li>
+        <li><input type="checkbox" id="s-pm2" /><label for="s-pm2">Scope 50–100：時間／材料等邊界（模板 race-track 例改寫成本週專案；附圖需 caption＋引用）</label></li>
+        <li><input type="checkbox" id="s-pm3" /><label for="s-pm3">≥2 Objectives，各 20–50 字含 SMART</label></li>
+        <li><input type="checkbox" id="s-pm4" /><label for="s-pm4">≥2 Work packages（標題＋摘要）</label></li>
+        <li><input type="checkbox" id="s-pm5" /><label for="s-pm5">Tasks：標題、簡述、依賴、估時、時間序</label></li>
+        <li><input type="checkbox" id="s-pm6" /><label for="s-pm6">Milestones：綁 WP＋目標日時</label></li>
+        <li><input type="checkbox" id="s-pm7" /><label for="s-pm7">Deliverables：每任務短語＋所屬 WP</label></li>
+      </ol>
+      <p class="tip"><strong>提示：</strong>七欄齊；例子換成電晶體週實際交付。</p>
+    </article>
+
+    <article class="card" id="tm">
+      <h2>Advanced time management</h2>
+      <p class="meta"><span class="badge">Application</span><span class="badge group">組</span> GANTT＋上色 critical path(s)＋緩衝；三大排程風險 50–100 字</p>
+      <ol class="req">
+        <li><input type="checkbox" id="s-tm1" /><label for="s-tm1">拆任務；各自估時比對（可用 PERT）</label></li>
+        <li><input type="checkbox" id="s-tm2" /><label for="s-tm2">決定可工作時段／人力</label></li>
+        <li><input type="checkbox" id="s-tm3" /><label for="s-tm3">標並行；完成 GANTT</label></li>
+        <li><input type="checkbox" id="s-tm4" /><label for="s-tm4">Critical path(s)（如 pitch／QMS）；必要時砍範圍或重分配</label></li>
+        <li><input type="checkbox" id="s-tm5" /><label for="s-tm5">Critical path 用不同顏色標在 GANTT</label></li>
+        <li><input type="checkbox" id="s-tm6" /><label for="s-tm6">高風險先做；任務／專案末緩衝；避開緩衝陷阱</label></li>
+        <li><input type="checkbox" id="s-tm7" /><label for="s-tm7">作品集前三大排程風險 50–100 字</label></li>
+      </ol>
+      <p class="tip"><strong>提示：</strong>上色路徑＋三大風險最常被漏。</p>
+    </article>
+
+    <article class="card" id="qm">
+      <h2>Quality management system with change management</h2>
+      <p class="meta"><span class="badge">Application</span><span class="badge group">組＋個人 CI</span> 周四 11:15 Audit · 30 秒找檔</p>
+      <ol class="req">
+        <li><input type="checkbox" id="s-qm1" /><label for="s-qm1">ISO 風格資料夾樹齊全（含 Purchasing 空、Gallery 僅 Excel）</label></li>
+        <li><input type="checkbox" id="s-qm2" /><label for="s-qm2">Procedure：命名 Word（版本控制／易找／全員懂）</label></li>
+        <li><input type="checkbox" id="s-qm3" /><label for="s-qm3">Gallery Excel：全部檔名＋路徑</label></li>
+        <li><input type="checkbox" id="s-qm4" /><label for="s-qm4">Engineering：Traceability 做到 verification（同 Y1 Synthesis）</label></li>
+        <li><input type="checkbox" id="s-qm5" /><label for="s-qm5">個人 CI 50–100 字（講義一種方法）</label></li>
+        <li><input type="checkbox" id="s-qm6" /><label for="s-qm6">GitHub：branch → 改 → merge main（可貼連結）</label></li>
+        <li><input type="checkbox" id="s-qm7" /><label for="s-qm7">稽核前演練 30 秒抽檔</label></li>
+      </ol>
+      <p class="tip"><strong>提示：</strong>找得快＞寫得長；CI 與 Git 證據別漏。</p>
+    </article>
+
+    <footer>非官方整理 · 以 Moodle／課程頁為準 · <a href="index.html">完整逐步指南</a></footer>
+  </main>
+  <script>
+    (function () {
+      const KEY = "pw1-skills-checklist-v1";
+      let state = {};
+      try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (_) {}
+      document.querySelectorAll('input[type="checkbox"]').forEach((el) => {
+        if (state[el.id]) el.checked = true;
+        el.addEventListener("change", () => {
+          state[el.id] = el.checked;
+          localStorage.setItem(KEY, JSON.stringify(state));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
