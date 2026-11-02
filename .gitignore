@@ -1,0 +1,12 @@
+# OS / Office lock files
+Thumbs.db
+Desktop.ini
+~$*
+*.tmp
+
+# Python helper scripts (optional local)
+**/__pycache__/
+*.pyc
+
+# Large local-only caches
+.DS_Store

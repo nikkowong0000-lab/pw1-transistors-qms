@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PW1 Advanced Time Management — 可提交版</title>
+<style>
+  :root {
+    --ink: #142028;
+    --muted: #4a5c66;
+    --line: #d5ddd8;
+    --mint: #1a6b56;
+    --edit: #fff8e1;
+    --edit-bd: #f0c94d;
+    --paper: #f7f9f8;
+    --cp-a: #c62828;
+    --cp-b: #1565c0;
+    --cp-c: #ef6c00;
+    --buf: #7b1fa2;
+    --ok: #2e7d32;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+    font-size: 15px;
+  }
+  .toolbar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+    padding: .6rem 1rem;
+    background: #0f1c24; color: #fff;
+  }
+  .toolbar strong { margin-right: .5rem; }
+  .toolbar button, .toolbar a.btn {
+    border: 0; border-radius: 6px; padding: .45rem .8rem;
+    font-weight: 600; cursor: pointer; font-size: .85rem;
+    text-decoration: none; color: #0f1c24; background: #e8f5ef;
+  }
+  .toolbar button.secondary { background: #ffe0b2; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 1rem 1rem 3rem; }
+
+  .howto {
+    background: #e8f5f0; border: 1px solid #9bcbb8;
+    border-radius: 10px; padding: 1rem 1.1rem; margin-bottom: 1rem;
+  }
+  .howto h1 { margin: 0 0 .4rem; font-size: 1.35rem; }
+  .howto ol { margin: .4rem 0 0 1.2rem; padding: 0; color: var(--muted); }
+  .howto li + li { margin-top: .25rem; }
+
+  .edit-box {
+    background: var(--edit);
+    border: 2px dashed #e6b422;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+  }
+  .edit-box > .label {
+    display: inline-block;
+    background: #e6b422; color: #1a1400;
+    font-size: .75rem; font-weight: 700;
+    padding: .15rem .5rem; border-radius: 4px;
+    margin-bottom: .6rem;
+  }
+  .edit-box h2 { margin: 0 0 .6rem; font-size: 1.05rem; }
+  .grid-2 { display: grid; gap: .75rem; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+  label.field { display: block; font-size: .82rem; font-weight: 600; margin-bottom: .2rem; }
+  input[type="text"], input[type="time"], textarea, select {
+    width: 100%; padding: .5rem .6rem; border: 1px solid #c9b56a;
+    border-radius: 6px; background: #fff; font: inherit;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  .hint { font-size: .78rem; color: var(--muted); margin-top: .2rem; }
+  .counter { font-size: .78rem; margin-top: .25rem; }
+  .counter.ok { color: var(--ok); }
+  .counter.bad { color: var(--cp-a); }
+
+  section.card {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: 10px; padding: 1rem 1.1rem; margin-bottom: 1rem;
+  }
+  section.card h2 {
+    margin: 0 0 .7rem; font-size: 1.12rem;
+    border-bottom: 2px solid #d9e4dc; padding-bottom: .4rem;
+  }
+  section.card h3 { margin: 1rem 0 .4rem; font-size: .98rem; color: var(--mint); }
+  table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  th, td { border: 1px solid var(--line); padding: .4rem .5rem; text-align: left; vertical-align: top; }
+  th { background: #e8f0eb; }
+  .legend { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 0.8rem; }
+  .pill {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-size: .78rem; padding: .2rem .55rem; border-radius: 999px;
+    border: 1px solid var(--line); background: #fff;
+  }
+  .swatch { width: 12px; height: 12px; border-radius: 2px; }
+  .swatch.a { background: var(--cp-a); }
+  .swatch.b { background: var(--cp-b); }
+  .swatch.c { background: var(--cp-c); }
+  .swatch.buf { background: var(--buf); }
+  .swatch.n { background: #78909c; }
+
+  .gantt-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+  .gantt {
+    min-width: 720px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+  }
+  .gantt .head, .gantt .row-label, .gantt .row-bars {
+    border-bottom: 1px solid var(--line);
+    min-height: 34px;
+  }
+  .gantt .head {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 200px repeat(5, 1fr);
+    background: #e8f0eb; font-size: .8rem; font-weight: 700;
+  }
+  .gantt .head span { padding: .45rem .4rem; border-left: 1px solid var(--line); }
+  .gantt .head span:first-child { border-left: 0; }
+  .gantt .row-label {
+    padding: .35rem .5rem; font-size: .78rem; background: #fff;
+    display: flex; align-items: center;
+  }
+  .gantt .row-bars {
+    position: relative;
+    background:
+      repeating-linear-gradient(90deg,
+        transparent 0, transparent calc(20% - 1px),
+        #e8ecea calc(20% - 1px), #e8ecea 20%);
+  }
+  .bar {
+    position: absolute; top: 6px; height: 22px; border-radius: 4px;
+    font-size: .68rem; color: #fff; display: flex; align-items: center;
+    padding: 0 .35rem; white-space: nowrap; overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+  }
+  .bar.cp-a { background: var(--cp-a); }
+  .bar.cp-b { background: var(--cp-b); }
+  .bar.cp-c { background: var(--cp-c); }
+  .bar.buf { background: var(--buf); }
+  .bar.normal { background: #607d8b; }
+  .bar.mile { background: #212121; }
+
+  .live { font-weight: 600; }
+  .muted { color: var(--muted); }
+  .checklist { list-style: none; padding: 0; margin: 0; }
+  .checklist li {
+    display: flex; gap: .55rem; align-items: flex-start;
+    padding: .45rem .5rem; border: 1px solid var(--line);
+    border-radius: 8px; margin-bottom: .4rem; background: #fff;
+  }
+  .small { font-size: .82rem; color: var(--muted); }
+
+  @media print {
+    .toolbar, .howto, .no-print { display: none !important; }
+    .edit-box {
+      background: #fff; border: 1px solid #999;
+      break-inside: avoid;
+    }
+    .edit-box > .label { background: #333; color: #fff; }
+    body { background: #fff; }
+    section.card, .edit-box { break-inside: avoid; }
+    input, textarea {
+      border: none !important; background: transparent !important;
+      padding-left: 0 !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar no-print">
+    <strong>可提交 Time Management</strong>
+    <button type="button" onclick="window.print()">列印 / 存 PDF</button>
+    <button type="button" class="secondary" onclick="saveLocal()">儲存我的修改（本機）</button>
+    <button type="button" class="secondary" onclick="loadLocal()">載入上次修改</button>
+    <button type="button" onclick="resetDefaults()">恢復預設</button>
+  </div>
+
+  <div class="wrap">
+    <div class="howto no-print">
+      <h1>Advanced Time Management — 可交檔</h1>
+      <ol>
+        <li>只改黃色「✏️ 改這裡」區塊（組員、工時、風險文字）。</li>
+        <li>下面 GANTT／關鍵路徑會跟著更新（或依你改的說明文字）。</li>
+        <li>按「列印 / 存 PDF」→ 存成 PDF，或直接整頁截圖。</li>
+        <li>把 PDF／截圖＋本 HTML＋CSV 放進 <code>QMS/Operations/</code>，再寫進 Documents gallery。</li>
+        <li>Mahara：貼「前三大風險」短文＋附上 GANTT 截圖。</li>
+      </ol>
+    </div>
+
+    <!-- ========== EDIT ZONE ========== -->
+    <div class="edit-box" id="edit-zone">
+      <span class="label">✏️ 改這裡（整份檔只需改這一區）</span>
+      <h2>1) 組別與可工作時段</h2>
+      <div class="grid-2">
+        <div>
+          <label class="field" for="groupName">組名 / Group</label>
+          <input id="groupName" type="text" value="PW1 Transistors Group __" />
+        </div>
+        <div>
+          <label class="field" for="teamSize">人數</label>
+          <input id="teamSize" type="text" value="6" />
+        </div>
+        <div>
+          <label class="field" for="workDays">工作日</label>
+          <input id="workDays" type="text" value="Mon–Fri（Week 6）" />
+        </div>
+        <div>
+          <label class="field" for="workHours">每日工時（含午休標註）</label>
+          <input id="workHours" type="text" value="09:30–17:00（午休 12:30–13:30）" />
+        </div>
+        <div>
+          <label class="field" for="streamA">Stream A（量測）成員</label>
+          <input id="streamA" type="text" value="成員1, 成員2" />
+        </div>
+        <div>
+          <label class="field" for="streamB">Stream B（閘／加器）成員</label>
+          <input id="streamB" type="text" value="成員3, 成員4" />
+        </div>
+        <div>
+          <label class="field" for="streamC">Stream C（QMS／文件）成員</label>
+          <input id="streamC" type="text" value="成員5, 成員6" />
+        </div>
+        <div>
+          <label class="field" for="netHours">每人每日淨工時（小時）</label>
+          <input id="netHours" type="text" value="6.5" />
+        </div>
+      </div>
+
+      <h2 style="margin-top:1rem">2) 前三大排程風險（課程要求約 50–100 字）</h2>
+      <label class="field" for="risks">直接改這段，交 Mahara 就貼這裡</label>
+      <textarea id="risks">半加器除錯逾時會直接擠壓週五全加器演練；QMS 檔名未凍結會讓週四 11:15 稽核找檔失敗；個人影片常低估剪輯而拖到週五中午。對策：週三設半加器檢查點並配置任務緩衝、週三凍結 QMS 結構並演練 30 秒找檔、週四晚強制影片定稿再於週五 12:00 前提交 Moodle。</textarea>
+      <div id="riskCounter" class="counter">字數：—</div>
+      <p class="hint">建議 50–100 個中文字（含標點）。不夠或太長會用顏色提示。</p>
+
+      <h2 style="margin-top:1rem">3) 若進度落後，我們會怎麼救（可改）</h2>
+      <textarea id="recovery">1) 把非關鍵文件（循環經濟長文）縮短，人力支援半加器。2) 週一上午先建 QMS 空樹與命名規則，避免稽核前才整理。3) 影片腳本週二定稿，週四晚只留剪輯緩衝，不開新內容。</textarea>
+    </div>
+
+    <!-- ========== LIVE SUMMARY ========== -->
+    <section class="card">
+      <h2>A. 專案時段與資源（自動帶入你的修改）</h2>
+      <p><span class="live" id="outGroup">—</span>　｜　人數 <span class="live" id="outSize">—</span></p>
+      <p class="muted" id="outHours">—</p>
+      <p class="muted">並行三線：A 量測（<span id="outA">—</span>）｜B 閘／加器（<span id="outB">—</span>）｜C QMS／文件（<span id="outC">—</span>）</p>
+      <p class="muted">估計全組人時 ≈ <span class="live" id="outPersonHours">—</span>（5 天 × 人數 × 淨工時）</p>
+    </section>
+
+    <section class="card">
+      <h2>B. 硬性 Deadline</h2>
+      <table>
+        <thead><tr><th>時間</th><th>事件</th><th>為何卡死整週</th></tr></thead>
+        <tbody>
+          <tr><td>Mon 11:15</td><td>Kit Handout</td><td>沒料就不能量測／做閘</td></tr>
+          <tr><td>Thu 11:15</td><td>QMS Audit</td><td>30 秒內找到被點名文件</td></tr>
+          <tr><td>Thu 晚</td><td>個人影片定稿</td><td>技能頁要求周四結束前；Fri 12:00 Moodle</td></tr>
+          <tr><td>Fri 10:15</td><td>Full adder challenge</td><td>半加器必須先完成</td></tr>
+          <tr><td>Fri 12:00</td><td>影片 Moodle</td><td>個人繳交截止</td></tr>
+          <tr><td>Fri 12:15</td><td>Kit return</td><td>專案收尾</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>C. PERT 工時估計（怎麼估任務長度）</h2>
+      <p class="small">公式：期望工時 \(t_e=(O+4M+P)/6\)。O=樂觀、M=最可能、P=悲觀。</p>
+      <table>
+        <thead>
+          <tr><th>任務</th><th>O</th><th>M</th><th>P</th><th>t<sub>e</sub></th><th>說明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Half adder</td><td>1.5h</td><td>2.5h</td><td>4.0h</td><td><strong>2.58h</strong></td><td>技術風險最高</td></tr>
+          <tr><td>QMS setup</td><td>1.5h</td><td>2.5h</td><td>4.0h</td><td><strong>2.58h</strong></td><td>含命名＋gallery</td></tr>
+          <tr><td>Individual video</td><td>1.5h</td><td>2.5h</td><td>4.5h</td><td><strong>2.67h</strong></td><td>剪輯常超時</td></tr>
+        </tbody>
+      </table>
+      <p class="hint">若要改數字：編輯同資料夾的 <code>PW1_GANTT_tasks.csv</code>（Excel 打開），並同步改下方「任務資料」註解區。</p>
+    </section>
+
+    <section class="card" id="gantt-section">
+      <h2>D. GANTT（含關鍵路徑上色）— 截這一區交</h2>
+      <div class="legend">
+        <span class="pill"><i class="swatch a"></i> CP-A 技術／Full adder</span>
+        <span class="pill"><i class="swatch b"></i> CP-B QMS／Audit</span>
+        <span class="pill"><i class="swatch c"></i> CP-C 影片／簡報</span>
+        <span class="pill"><i class="swatch buf"></i> Buffer 緩衝</span>
+        <span class="pill"><i class="swatch n"></i> 非關鍵／並行</span>
+      </div>
+      <div class="gantt-wrap">
+        <div class="gantt" id="gantt"></div>
+      </div>
+      <p class="small" style="margin-top:.6rem">橫軸：Mon → Fri。同色長條 = 同一條關鍵路徑。紫色 = 故意留的緩衝（不要拿去加新功能）。</p>
+    </section>
+
+    <section class="card">
+      <h2>E. Critical Path 分析</h2>
+      <h3>CP-A（紅）技術交付 → Fri 10:15</h3>
+      <p class="small">Kit → Logic gates → Half adder →（緩衝）→ Full adder 演練 → Challenge</p>
+      <h3>CP-B（藍）QMS → Thu 11:15</h3>
+      <p class="small">QMS setup →（緩衝）→ Audit prep／30 秒找檔演練 → Audit</p>
+      <h3>CP-C（橙）溝通產出 → Fri 12:00</h3>
+      <p class="small">Research → Slideshow／Video → Thu 晚定稿緩衝 → Moodle 提交</p>
+      <h3>若 GANTT 顯示會來不及</h3>
+      <p id="outRecovery" class="small">—</p>
+    </section>
+
+    <section class="card">
+      <h2>F. 緩衝（Buffer）配置</h2>
+      <table>
+        <thead><tr><th>類型</th><th>位置</th><th>時長</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>任務緩衝</td><td>半加器後 Wed PM</td><td>1 h</td><td>吸除錯延遲</td></tr>
+          <tr><td>任務緩衝</td><td>QMS 建完後</td><td>1 h</td><td>補 gallery／命名</td></tr>
+          <tr><td>專案末緩衝</td><td>Thu 16:00–17:00</td><td>1 h</td><td>影片／簡報超時</td></tr>
+          <tr><td>專案末緩衝</td><td>Fri 09:30–10:00</td><td>0.5 h</td><td>挑戰前最後整合</td></tr>
+        </tbody>
+      </table>
+      <p class="small"><strong>避坑：</strong>緩衝只用來吸收延遲，不拿來加新範圍（否則等於沒緩衝）。</p>
+    </section>
+
+    <section class="card">
+      <h2>G. 前三大排程風險（作品集用）</h2>
+      <p id="outRisks" style="white-space:pre-wrap">—</p>
+    </section>
+
+    <section class="card no-print">
+      <h2>H. 繳交勾選</h2>
+      <ul class="checklist">
+        <li><input type="checkbox" id="chk1" /><label for="chk1">已改組員姓名與工時</label></li>
+        <li><input type="checkbox" id="chk2" /><label for="chk2">風險短文在 50–100 字</label></li>
+        <li><input type="checkbox" id="chk3" /><label for="chk3">已截圖／PDF 本頁 GANTT 區</label></li>
+        <li><input type="checkbox" id="chk4" /><label for="chk4">檔案已放入 QMS/Operations/ 並寫入 Documents gallery</label></li>
+        <li><input type="checkbox" id="chk5" /><label for="chk5">Mahara Time Management 區已上傳截圖＋貼上風險短文</label></li>
+      </ul>
+    </section>
+  </div>
+
+<script>
+/*****************************************************************
+ * ✏️ 進階修改：任務條（改時間／名稱就改這裡，然後存檔重新整理）
+ * day: 0=Mon … 4=Fri
+ * start/end: 一天內 0–1 的比例（09:30=0, 17:00=1，略估）
+ * type: 'cp-a' | 'cp-b' | 'cp-c' | 'buf' | 'normal' | 'mile'
+ *****************************************************************/
+const TASKS = [
+  { name: "Kit handout", day0: 0, s: 0.25, day1: 0, e: 0.35, type: "mile" },
+  { name: "Research BJT/MOSFET", day0: 0, s: 0.00, day1: 1, e: 0.40, type: "cp-c" },
+  { name: "I/O characterisation", day0: 0, s: 0.50, day1: 2, e: 0.40, type: "normal" },
+  { name: "Logic gates", day0: 0, s: 0.50, day1: 1, e: 1.00, type: "cp-a" },
+  { name: "Half adder", day0: 2, s: 0.00, day1: 2, e: 0.70, type: "cp-a" },
+  { name: "Buffer (half adder)", day0: 2, s: 0.70, day1: 2, e: 0.85, type: "buf" },
+  { name: "QMS setup", day0: 0, s: 0.00, day1: 2, e: 0.75, type: "cp-b" },
+  { name: "Buffer (QMS)", day0: 2, s: 0.75, day1: 2, e: 0.90, type: "buf" },
+  { name: "Audit prep", day0: 2, s: 0.90, day1: 3, e: 0.22, type: "cp-b" },
+  { name: "QMS Audit 11:15", day0: 3, s: 0.22, day1: 3, e: 0.35, type: "mile" },
+  { name: "Slideshow", day0: 1, s: 0.50, day1: 3, e: 1.00, type: "cp-c" },
+  { name: "Individual video", day0: 1, s: 0.85, day1: 3, e: 0.85, type: "cp-c" },
+  { name: "Buffer (video/slides)", day0: 3, s: 0.85, day1: 3, e: 1.00, type: "buf" },
+  { name: "Full adder rehearse", day0: 3, s: 0.50, day1: 4, e: 0.10, type: "cp-a" },
+  { name: "Buffer (pre-FA)", day0: 4, s: 0.00, day1: 4, e: 0.10, type: "buf" },
+  { name: "Full adder 10:15", day0: 4, s: 0.12, day1: 4, e: 0.40, type: "mile" },
+  { name: "Video Moodle 12:00", day0: 4, s: 0.35, day1: 4, e: 0.40, type: "mile" },
+  { name: "Kit return 12:15", day0: 4, s: 0.42, day1: 4, e: 0.55, type: "normal" },
+];
+
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+const STORAGE_KEY = "pw1_tm_submit_v1";
+
+function countZh(str) {
+  return Array.from(str.trim()).length;
+}
+
+function refreshOutputs() {
+  const groupName = document.getElementById("groupName").value;
+  const teamSize = document.getElementById("teamSize").value;
+  const workDays = document.getElementById("workDays").value;
+  const workHours = document.getElementById("workHours").value;
+  const netHours = parseFloat(document.getElementById("netHours").value) || 0;
+  const size = parseFloat(teamSize) || 0;
+
+  document.getElementById("outGroup").textContent = groupName;
+  document.getElementById("outSize").textContent = teamSize;
+  document.getElementById("outHours").textContent = workDays + " · " + workHours;
+  document.getElementById("outA").textContent = document.getElementById("streamA").value;
+  document.getElementById("outB").textContent = document.getElementById("streamB").value;
+  document.getElementById("outC").textContent = document.getElementById("streamC").value;
+  document.getElementById("outPersonHours").textContent = (size * netHours * 5).toFixed(0) + " h";
+  document.getElementById("outRisks").textContent = document.getElementById("risks").value;
+  document.getElementById("outRecovery").textContent = document.getElementById("recovery").value;
+
+  const n = countZh(document.getElementById("risks").value);
+  const el = document.getElementById("riskCounter");
+  el.textContent = "字數：" + n + "（目標 50–100）";
+  el.className = "counter " + (n >= 50 && n <= 100 ? "ok" : "bad");
+}
+
+function fracToPct(day, frac) {
+  return ((day + frac) / 5) * 100;
+}
+
+function renderGantt() {
+  const root = document.getElementById("gantt");
+  let html = '<div class="head"><span>任務</span>';
+  DAYS.forEach((d) => { html += "<span>" + d + "</span>"; });
+  html += "</div>";
+
+  TASKS.forEach((t) => {
+    const left = fracToPct(t.day0, t.s);
+    const right = fracToPct(t.day1, t.e);
+    const width = Math.max(right - left, 1.2);
+    html += '<div class="row-label">' + t.name + "</div>";
+    html += '<div class="row-bars">';
+    html += '<div class="bar ' + t.type + '" style="left:' + left + "%;width:" + width + '%">' +
+      (width > 8 ? t.name : "") + "</div>";
+    html += "</div>";
+  });
+  root.innerHTML = html;
+}
+
+function collectForm() {
+  const ids = ["groupName","teamSize","workDays","workHours","streamA","streamB","streamC","netHours","risks","recovery"];
+  const data = {};
+  ids.forEach((id) => { data[id] = document.getElementById(id).value; });
+  return data;
+}
+
+function applyForm(data) {
+  if (!data) return;
+  Object.keys(data).forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = data[id];
+  });
+  refreshOutputs();
+}
+
+function saveLocal() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(collectForm()));
+  alert("已儲存到這個瀏覽器。換電腦請改用「另存 HTML」或手動記在 CSV/文件裡。");
+}
+
+function loadLocal() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) { alert("還沒有儲存過。"); return; }
+  applyForm(JSON.parse(raw));
+  alert("已載入。");
+}
+
+function resetDefaults() {
+  if (!confirm("恢復預設文字？你在黃色區的修改會消失（除非已另存）。")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+["groupName","teamSize","workDays","workHours","streamA","streamB","streamC","netHours","risks","recovery"]
+  .forEach((id) => {
+    document.getElementById(id).addEventListener("input", refreshOutputs);
+  });
+
+renderGantt();
+refreshOutputs();
+</script>
+</body>
+</html>

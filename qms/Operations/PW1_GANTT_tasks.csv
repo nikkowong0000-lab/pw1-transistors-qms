@@ -1,0 +1,22 @@
+TaskID,TaskName_EN,TaskName_ZH,Stream,DayStart,StartTime,DayEnd,EndTime,Duration_h_te,Optimistic_h,MostLikely_h,Pessimistic_h,DependsOn,CriticalPath,CriticalPathColour,BufferAfter_h,Notes
+T01,Kit Handout & inventory,Kit 領取與清點,All,Mon,11:15,Mon,12:00,0.55,0.3,0.5,1.0,,CP-A|CP-B,red|blue,0,Hard milestone Mon 11:15
+T02,Research BJT/MOSFET,研究 BJT/MOSFET,Team A (+all),Mon,09:30,Tue,12:30,2.58,1.5,2.5,4.0,,CP-C,amber,0,Can start before kit; feeds slides+video
+T03,I/O characterisation,I/O 特性量測,Team A,Mon,13:30,Wed,12:30,3.58,2.0,3.5,5.5,T01,,,#5a8f6a,0,Parallel with T04
+T04,Logic gates,邏輯閘實作,Team B,Mon,13:30,Tue,17:00,3.17,2.0,3.0,5.0,T01,CP-A,red,0,Critical path to full adder
+T05,Half adder,半加器,Team B,Wed,09:30,Wed,15:00,2.58,1.5,2.5,4.0,T04,CP-A,red,1.0,Highest technical risk; 1h task buffer after
+T05b,Task buffer (half adder),半加器任務緩衝,Team B,Wed,15:00,Wed,16:00,1.0,,, ,T05,CP-A,red,0,Do not consume for new scope
+T06,Full adder rehearsal,全加器整合演練,Team B (+A),Thu,13:30,Fri,10:00,2.08,1.0,2.0,3.5,T05,CP-A,red,0,Must be ready before Fri 10:15
+T06b,Project buffer (pre-challenge),挑戰前專案緩衝,All,Fri,09:30,Fri,10:00,0.5,,, ,T06,CP-A,red,0,Last integration only
+M-FA,Full adder challenge,全加器挑戰（硬節點）,All,Fri,10:15,Fri,12:00,1.75,,, ,T06,CP-A,red,0,Hard milestone Fri 10:15
+T07,Team slideshow,團隊簡報,Team C (+A/B),Tue,13:30,Thu,17:00,2.58,1.5,2.5,4.0,T02,CP-C,amber,0,Finalize Thu evening
+T08,Individual 3-min video,個人三分鐘影片,Individual,Tue,17:00,Thu,21:00,2.67,1.5,2.5,4.5,T02,CP-C,amber,0,Done Thu evening; submit Fri 12:00 Moodle
+T08b,Project buffer (video/slides),影片／簡報專案末緩衝,Individual/C,Thu,16:00,Thu,17:00,1.0,,, ,T07|T08,CP-C,amber,0,Absorb overrun only
+M-VID,Video Moodle submit,影片 Moodle 提交,Individual,Fri,11:30,Fri,12:00,0.5,,, ,T08,CP-C,amber,0,Hard deadline Fri 12:00
+T09,QMS setup,QMS 建置,Team C,Mon,09:30,Wed,15:30,2.58,1.5,2.5,4.0,,CP-B,blue,1.0,Freeze names Wed; before Thu audit
+T09b,Task buffer (QMS),QMS 任務緩衝,Team C,Wed,15:30,Wed,16:30,1.0,,, ,T09,CP-B,blue,0,Gallery/drill only
+T10,Thursday audit prep,週四稽核演練,Team C (+all),Wed,16:30,Thu,11:00,1.00,0.5,1.0,1.5,T09,CP-B,blue,0,30-second document find drills
+M-AUD,QMS Audit,QMS 稽核（硬節點）,All,Thu,11:15,Thu,12:00,0.75,,, ,T10,CP-B,blue,0,Hard milestone Thu 11:15
+T11,Circular economy writeup,循環經濟寫作,Team C,Tue,09:30,Thu,15:00,1.58,1.0,1.5,2.5,,,#8a8580,0,Non-critical; cut first if overrun
+T12,Leadership docs,領導力文件,Team C (+all),Mon,09:30,Wed,12:30,2.00,1.0,2.0,3.0,,,#8a8580,0,Charter signed Mon-Tue
+T13,Kit return & wrap-up,器材歸還與收尾,All,Fri,12:15,Fri,13:00,0.55,0.3,0.5,1.0,M-FA|M-VID,,,#444,0,Hard milestone Fri 12:15
+SYNC,Cross-stream sync,跨組同步檢查點,All,Wed,15:00,Wed,15:30,0.5,,, ,T03|T05,,,#666,0,I/O summary to gates team

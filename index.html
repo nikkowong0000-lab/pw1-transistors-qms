@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PW1 Transistors · 逐步教學指南</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f1c24;
+      --ink-soft: #3a4d58;
+      --paper: #f3f6f4;
+      --mint: #1f7a63;
+      --mint-deep: #145544;
+      --sand: #d9e4dc;
+      --amber: #c47a22;
+      --line: rgba(15, 28, 36, 0.12);
+      --glow: rgba(31, 122, 99, 0.18);
+      --nav-h: 64px;
+      --max: 920px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Instrument Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #cfe8dc 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #e8dfc8 0%, transparent 50%),
+        linear-gradient(180deg, #eef3f0 0%, var(--paper) 40%, #e7eee9 100%);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    a { color: var(--mint-deep); text-underline-offset: 3px; }
+    a:hover { color: var(--mint); }
+
+    .topnav {
+      position: sticky; top: 0; z-index: 40;
+      height: var(--nav-h);
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0 1.25rem;
+      backdrop-filter: blur(12px);
+      background: rgba(243, 246, 244, 0.82);
+      border-bottom: 1px solid var(--line);
+    }
+    .topnav .brand {
+      font-weight: 700; letter-spacing: -0.02em;
+      white-space:nowrap; font-size: 0.95rem;
+    }
+    .topnav .brand span { color: var(--mint); }
+    .topnav nav {
+      display: flex; gap: 0.35rem; overflow-x: auto;
+      scrollbar-width: none; flex: 1;
+    }
+    .topnav nav::-webkit-scrollbar { display: none; }
+    .topnav a {
+      text-decoration: none; color: var(--ink-soft);
+      font-size: 0.82rem; font-weight: 500;
+      padding: 0.4rem 0.7rem; border-radius: 999px;
+      white-space: nowrap;
+    }
+    .topnav a:hover, .topnav a.active {
+      background: var(--sand); color: var(--ink);
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100vh - var(--nav-h));
+      display: grid;
+      align-content: end;
+      padding: 4rem 1.5rem 3.5rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(115deg, rgba(15,28,36,0.88) 0%, rgba(20,85,68,0.72) 48%, rgba(15,28,36,0.55) 100%),
+        repeating-linear-gradient(-18deg, transparent 0 18px, rgba(255,255,255,0.03) 18px 19px);
+      z-index: 0;
+      animation: heroWash 14s ease-in-out infinite alternate;
+    }
+    @keyframes heroWash {
+      from { filter: saturate(1); }
+      to { filter: saturate(1.15) brightness(1.05); }
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 780px; margin: 0 auto; width: 100%;
+      color: #f7faf8;
+      animation: riseIn 0.9s ease both;
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: none; }
+    }
+    .hero .uni {
+      font-size: 0.85rem; letter-spacing: 0.14em;
+      text-transform: uppercase; opacity: 0.85; margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(2.6rem, 7vw, 4.4rem);
+      line-height: 1.05; font-weight: 600;
+      letter-spacing: -0.03em; margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.1rem; max-width: 36rem;
+      opacity: 0.9; margin-bottom: 1.75rem;
+    }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.75rem 1.2rem; border-radius: 8px;
+      font-weight: 600; font-size: 0.95rem;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: #e8f5ef; color: var(--mint-deep); }
+    .btn-ghost {
+      background: transparent; color: #f7faf8;
+      outline: 1px solid rgba(255,255,255,0.35);
+    }
+
+    main { padding-bottom: 5rem; }
+    section.block {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 3.25rem 1.5rem 0;
+    }
+    .block-label {
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--mint); margin-bottom: 0.6rem;
+    }
+    .block h2 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(1.7rem, 3.5vw, 2.25rem);
+      font-weight: 600; letter-spacing: -0.02em;
+      margin-bottom: 0.75rem; line-height: 1.2;
+    }
+    .block > .lede {
+      color: var(--ink-soft); margin-bottom: 1.5rem; max-width: 40rem;
+    }
+
+    .steps { counter-reset: step; display: grid; gap: 1rem; }
+    .step {
+      position: relative;
+      padding: 1.15rem 1.15rem 1.15rem 3.4rem;
+      border-left: 2px solid var(--sand);
+      background: linear-gradient(90deg, rgba(255,255,255,0.65), transparent);
+      border-radius: 0 12px 12px 0;
+      transition: border-color 0.25s ease;
+    }
+    .step:hover { border-left-color: var(--mint); }
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute; left: 0.85rem; top: 1.15rem;
+      width: 1.7rem; height: 1.7rem;
+      border-radius: 50%;
+      background: var(--mint); color: #fff;
+      font-size: 0.8rem; font-weight: 700;
+      display: grid; place-items: center;
+    }
+    .step h3 { font-size: 1.05rem; margin-bottom: 0.35rem; }
+    .step p, .step li { color: var(--ink-soft); font-size: 0.95rem; }
+    .step ul { margin: 0.4rem 0 0 1.1rem; }
+    .step li + li { margin-top: 0.25rem; }
+
+    .checklist {
+      list-style: none; display: grid; gap: 0.55rem;
+    }
+    .checklist li {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 0.7rem; align-items: start;
+      padding: 0.7rem 0.85rem;
+      background: rgba(255,255,255,0.55);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+    }
+    .checklist input {
+      margin-top: 0.25rem; width: 1.05rem; height: 1.05rem;
+      accent-color: var(--mint);
+    }
+    .checklist label { cursor: pointer; font-size: 0.95rem; }
+    .checklist label small {
+      display: block; color: var(--ink-soft); font-size: 0.82rem; margin-top: 0.15rem;
+    }
+
+    .grid-2 {
+      display: grid; gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .panel {
+      padding: 1.1rem 1.15rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid var(--line);
+    }
+    .panel h3 {
+      font-size: 0.95rem; margin-bottom: 0.45rem;
+      color: var(--mint-deep);
+    }
+    .panel p, .panel li { font-size: 0.9rem; color: var(--ink-soft); }
+    .panel ul { margin-left: 1.1rem; }
+    .panel li + li { margin-top: 0.2rem; }
+
+    .table-wrap { overflow-x: auto; margin: 1rem 0; border-radius: 10px; border: 1px solid var(--line); }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.88rem; background: rgba(255,255,255,0.7);
+    }
+    th, td {
+      padding: 0.55rem 0.75rem; text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    th { background: var(--sand); font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+    code, .mono {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 0.86em;
+      background: rgba(31,122,99,0.1);
+      padding: 0.1em 0.35em; border-radius: 4px;
+    }
+
+    .callout {
+      margin: 1.25rem 0;
+      padding: 1rem 1.15rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(196,122,34,0.12), rgba(31,122,99,0.08));
+      border: 1px solid rgba(196,122,34,0.28);
+    }
+    .callout strong { color: var(--amber); }
+    .callout p { font-size: 0.92rem; color: var(--ink-soft); }
+
+    .progress-bar {
+      position: fixed; left: 0; top: 0; height: 3px; width: 0;
+      background: linear-gradient(90deg, var(--mint), #7bc4a8);
+      z-index: 50; transition: width 0.1s linear;
+    }
+
+    .week-strip {
+      display: grid; gap: 0.5rem;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin: 1.25rem 0;
+    }
+    .day {
+      padding: 0.85rem 0.6rem;
+      text-align: center;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--line);
+      font-size: 0.8rem;
+      opacity: 0; transform: translateY(8px);
+      animation: dayIn 0.5s ease forwards;
+    }
+    .day:nth-child(1) { animation-delay: 0.05s; }
+    .day:nth-child(2) { animation-delay: 0.12s; }
+    .day:nth-child(3) { animation-delay: 0.19s; }
+    .day:nth-child(4) { animation-delay: 0.26s; }
+    .day:nth-child(5) { animation-delay: 0.33s; }
+    @keyframes dayIn {
+      to { opacity: 1; transform: none; }
+    }
+    .day b { display: block; font-size: 0.95rem; margin-bottom: 0.25rem; color: var(--mint-deep); }
+    .day.hot {
+      background: var(--mint); color: #fff; border-color: transparent;
+    }
+    .day.hot b { color: #fff; }
+
+    .qms-tree {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      padding: 1rem;
+      background: #0f1c24; color: #c8ddd4;
+      border-radius: 12px; overflow-x: auto;
+      white-space: pre;
+    }
+
+    footer {
+      max-width: var(--max); margin: 3rem auto 0;
+      padding: 1.5rem; color: var(--ink-soft); font-size: 0.85rem;
+      border-top: 1px solid var(--line);
+    }
+
+    details.faq {
+      margin: 0.6rem 0;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--line);
+    }
+    details.faq summary {
+      cursor: pointer; font-weight: 600; font-size: 0.95rem;
+    }
+    details.faq[open] summary { margin-bottom: 0.5rem; color: var(--mint-deep); }
+    details.faq p, details.faq li { font-size: 0.9rem; color: var(--ink-soft); }
+    details.faq ul { margin: 0.35rem 0 0 1.1rem; }
+
+    .skill-jump {
+      display: flex; flex-wrap: wrap; gap: 0.45rem;
+      margin: 0 0 1.5rem;
+    }
+    .skill-jump a {
+      text-decoration: none;
+      font-size: 0.78rem; font-weight: 600;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+    }
+    .skill-jump a:hover { border-color: var(--mint); color: var(--mint-deep); }
+
+    .skill-card {
+      margin: 1.75rem 0 0;
+      padding: 1.25rem 1.2rem 1.35rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      scroll-margin-top: calc(var(--nav-h) + 12px);
+    }
+    .skill-card > header {
+      display: flex; flex-wrap: wrap; align-items: baseline;
+      gap: 0.5rem 0.85rem;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .skill-card > header h3 {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.28rem; font-weight: 600;
+      letter-spacing: -0.02em; line-height: 1.25;
+      flex: 1 1 12rem;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 0.28rem 0.55rem; border-radius: 6px;
+      background: var(--mint); color: #fff;
+      white-space: nowrap;
+    }
+    .badge.group { background: #3a5a6e; }
+    .badge.solo { background: var(--amber); }
+    .skill-meta {
+      display: grid; gap: 0.65rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      margin-bottom: 1rem;
+    }
+    .skill-meta dt {
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--mint); margin-bottom: 0.15rem;
+    }
+    .skill-meta dd {
+      font-size: 0.9rem; color: var(--ink-soft);
+    }
+    .skill-card .checklist { margin-top: 0.35rem; }
+    .skill-card .checklist ol {
+      list-style: none; display: grid; gap: 0.45rem;
+      counter-reset: req;
+    }
+    .skill-card .checklist ol > li {
+      display: grid; grid-template-columns: auto auto 1fr;
+      gap: 0.55rem; align-items: start;
+      padding: 0.65rem 0.8rem;
+      background: rgba(243,246,244,0.85);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      font-size: 0.92rem;
+    }
+    .skill-card .checklist ol > li::before {
+      counter-increment: req;
+      content: counter(req);
+      width: 1.35rem; height: 1.35rem;
+      border-radius: 50%;
+      background: var(--sand); color: var(--mint-deep);
+      font-size: 0.72rem; font-weight: 700;
+      display: grid; place-items: center;
+      margin-top: 0.15rem;
+    }
+    .tip-box {
+      margin-top: 0.9rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(31,122,99,0.08), rgba(31,122,99,0.03));
+      border: 1px solid rgba(31,122,99,0.2);
+      font-size: 0.88rem; color: var(--ink-soft);
+    }
+    .tip-box strong { color: var(--mint-deep); }
+
+    @media (max-width: 700px) {
+      .week-strip { grid-template-columns: 1fr 1fr; }
+      .hero { min-height: auto; padding-top: 3rem; }
+      .skill-card .checklist ol > li {
+        grid-template-columns: auto 1fr;
+      }
+      .skill-card .checklist ol > li::before { grid-column: 1; }
+      .skill-card .checklist input { grid-column: 1; grid-row: 2; }
+      .skill-card .checklist label { grid-column: 2; grid-row: 1 / span 2; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progress"></div>
+
+  <header class="topnav">
+    <div class="brand">Bath <span>PW1</span> Transistors</div>
+    <nav id="toc">
+      <a href="#overview">總覽</a>
+      <a href="#milestones">時程</a>
+      <a href="#skills">技能證據</a>
+      <a href="skills-checklist.html">技能清單頁</a>
+      <a href="#task1">Task 1</a>
+      <a href="#task2">Task 2</a>
+      <a href="#task3">Task 3</a>
+      <a href="#task4">Task 4</a>
+      <a href="#deliverables">繳交清單</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <p class="uni">University of Bath · Year 2 Project Weeks</p>
+      <h1>The secret life of transistors</h1>
+      <p>把專案週資料整理成可跟著做的逐步指南：從 BJT／MOSFET 原理、量測、邏輯閘，到半加器／全加器與技能證據包。</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#overview">開始逐步教學</a>
+        <a class="btn btn-ghost" href="#deliverables">跳到繳交清單</a>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <!-- Overview -->
+    <section class="block" id="overview">
+      <p class="block-label">01 · Project brief</p>
+      <h2>專案目標與四段結構</h2>
+      <p class="lede">本週教你電晶體在現代科技中的原理與用途，並把量測與電路成果整理成面向<strong>非技術觀眾</strong>的簡報。同時練習專案管理、循環經濟與溝通技能。</p>
+
+      <div class="steps">
+        <div class="step">
+          <h3>研究與發現</h3>
+          <p>理解 BJT 與 MOSFET 如何運作，能用白話向非技術觀眾解釋結構與應用。</p>
+        </div>
+        <div class="step">
+          <h3>量測輸入／輸出特性</h3>
+          <p>實驗或模擬量測曲線，算出關鍵參數（如 ON/OFF ratio、transconductance），並解釋為何對數位系統重要。</p>
+        </div>
+        <div class="step">
+          <h3>用電晶體做邏輯閘</h3>
+          <p>實作 NOT／AND／OR／XOR，驗證真值表，並連結回輸出特性為何讓邏輯可靠。</p>
+        </div>
+        <div class="step">
+          <h3>半加器 → 全加器（小規模數位系統）</h3>
+          <p>用 XOR＋AND 做 half adder；週五與另一組串成 full adder，可嘗試 4-bit。</p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:1.5rem">
+        <p><strong>最終產出：</strong>把所學、所做、所量全部納入簡報，對象是非技術觀眾。另有個人 3 分鐘影片、QMS 稽核、kit 歸還等硬性節點。</p>
+      </div>
+
+      <div class="grid-2" style="margin-top:1.25rem">
+        <div class="panel">
+          <h3>組別</h3>
+          <p>每組 5–6 人，共 16 組（Moodle 可見分組）。</p>
+        </div>
+        <div class="panel">
+          <h3>時間</h3>
+          <p>整週進行（Week 6）。關鍵節點見下方時程。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Milestones -->
+    <section class="block" id="milestones">
+      <p class="block-label">02 · Timeline</p>
+      <h2>一週節點（跟著日曆走）</h2>
+      <p class="lede">把「什麼時候必須完成什麼」釘死，再回頭排 GANTT 與 critical path。</p>
+
+      <div class="week-strip">
+        <div class="day hot"><b>Mon</b>Kit Handout 11:15</div>
+        <div class="day"><b>Tue–Wed</b>研究＋量測＋閘</div>
+        <div class="day hot"><b>Thu</b>QMS Audit 11:15 · 影片截止</div>
+        <div class="day hot"><b>Fri AM</b>Full adder 10:15</div>
+        <div class="day hot"><b>Fri PM</b>影片 12:00 · Kit 歸還 12:15</div>
+      </div>
+
+      <figure style="margin:1.25rem 0 0;max-width:100%">
+        <img src="assets/PW1Y2Trans-project-timetable.png" alt="PW1 Transistors official project timetable" style="width:100%;height:auto;border:1px solid rgba(0,0,0,.08)" />
+        <figcaption style="margin-top:.45rem;font-size:.9rem;opacity:.75">官方 general_info 專案時間表（PW1Y2Trans.png）</figcaption>
+      </figure>
+
+      <div class="steps">
+        <div class="step">
+          <h3>Kit Handout — 週一 11:15</h3>
+          <p>領取材料；週五最終任務用料也會在本週發放。</p>
+        </div>
+        <div class="step">
+          <h3>Audit — 週四 11:15</h3>
+          <ul>
+            <li>依 ISO 9001 精神建立 QMS 資料夾樹與文件。</li>
+            <li>稽核員點名特定文件時，你有 <strong>30 秒</strong>找到。</li>
+            <li>評的是：找得準、找得快、結構清楚。</li>
+          </ul>
+        </div>
+        <div class="step">
+          <h3>Full adder challenge — 週五 10:15</h3>
+          <p>帶著可運作的 half adder，與另一組合出 full adder。</p>
+        </div>
+        <div class="step">
+          <h3>3 分鐘個人影片 — 週五 12:00（Moodle）</h3>
+          <p>說明電晶體結構、特性與應用給非技術觀眾。技能頁亦寫「星期四結束前」——以課程正式截止為準，建議週四晚上前上傳。</p>
+        </div>
+        <div class="step">
+          <h3>Kit Return &amp; Wrap-up — 週五 12:15</h3>
+          <p>歸還所有零件；團隊反思與回饋。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="block" id="skills">
+      <p class="block-label">03 · Skills (Application)</p>
+      <h2>六項技能 · Mahara 證據必做清單</h2>
+      <p class="lede">全部為 <strong>Application</strong> 等級。官方要求「Follow the template provided」——在 Mahara 模板對應欄位作答。下方依課程頁原文整理成可勾選清單（繁中說明 + 英文技能名）。獨立清單頁：<a href="skills-checklist.html">skills-checklist.html</a>。</p>
+
+      <nav class="skill-jump" aria-label="技能快速跳轉">
+        <a href="#sk-circular">Circular economy</a>
+        <a href="#sk-comm">Scientific communication</a>
+        <a href="#sk-lead">Team Leadership</a>
+        <a href="#sk-pm">Project management</a>
+        <a href="#sk-time">Time management</a>
+        <a href="#sk-qms">QMS + change</a>
+      </nav>
+
+      <div class="callout">
+        <p><strong>截止提醒（里程碑頁原文）：</strong>個人 3 分鐘影片須於<strong>星期四結束前</strong>繳交 Moodle（時間表亦標 Friday 12:00——以 Moodle「周四結束前」為準，建議周四晚前上傳）。QMS Audit：<strong>周四 11:15</strong>，被點名文件須 <strong>30 秒內</strong>找到。</p>
+      </div>
+
+      <!-- 1 Circular -->
+      <article class="skill-card" id="sk-circular">
+        <header>
+          <h3>Engineering design for circular economy</h3>
+          <span class="badge">Application</span>
+          <span class="badge group">組／模板</span>
+        </header>
+        <dl class="skill-meta">
+          <div><dt>必須產出</dt><dd>Mahara 模板三小節：4R＋技術、生命週期衝擊、金錢價值</dd></div>
+          <div><dt>字數／格式</dt><dd>課程未訂固定字數；依模板完整回答三題</dd></div>
+        </dl>
+        <div class="checklist">
+          <ol>
+            <li><input type="checkbox" id="ce1" /><label for="ce1">選一個設計流程：課堂講的 4 種之一；若自選其他流程，<strong>必須附可靠引用</strong></label></li>
+            <li><input type="checkbox" id="ce2" /><label for="ce2">標出該流程涵蓋的 4R（可只選部分原則，不必全用）</label></li>
+            <li><input type="checkbox" id="ce3" /><label for="ce3">每個選到的 R：說明用了什麼技術／決策流程／技術手段來實現它</label></li>
+            <li><input type="checkbox" id="ce4" /><label for="ce4">描述產品／服務的生命週期各階段</label></li>
+            <li><input type="checkbox" id="ce5" /><label for="ce5">評估各階段衝擊（可用課堂 CO₂ 數據、講義提到的 PCB footprint 論文；軟體可參考課程連結的 sustainable software 網站）</label></li>
+            <li><input type="checkbox" id="ce6" /><label for="ce6">加總各階段衝擊 → 整體衝擊</label></li>
+            <li><input type="checkbox" id="ce7" /><label for="ce7">說明此流程何處創造金錢價值：節流、新營收、資源效率、就業、市場價值、風險緩解等（可持續軟體市值可參考課程 blog）</label></li>
+          </ol>
+        </div>
+        <p class="tip-box"><strong>過關提示：</strong>三題都要答滿；R 與「技術手段」要一一對應，不要只列名詞。</p>
+      </article>
+
+      <!-- 2 Communication -->
+      <article class="skill-card" id="sk-comm">
+        <header>
+          <h3>Scientific communication to a non-technical audience</h3>
+          <span class="badge">Application</span>
+          <span class="badge solo">個人</span>
+        </header>
+        <dl class="skill-meta">
+          <div><dt>必須產出</dt><dd>個人錄影；依講義準則；放入 Mahara 模板；並依里程碑上傳 Moodle</dd></div>
+          <div><dt>長度／截止</dt><dd>≤ <strong>3 分鐘</strong>；周四結束前繳 Moodle</dd></div>
+          <div><dt>題目</dt><dd>向非技術觀眾介紹電晶體<strong>結構、特性、應用</strong>；設定為向「病人」推銷產品、講清獨特賣點</dd></div>
+        </dl>
+        <div class="checklist">
+          <ol>
+            <li><input type="checkbox" id="sc1" /><label for="sc1"><strong>Clarity：</strong>開頭就講清主題與目的；突出相對其他方案的 USP</label></li>
+            <li><input type="checkbox" id="sc2" /><label for="sc2"><strong>Logical flow：</strong>引入 → 展開 → 限時內結論</label></li>
+            <li><input type="checkbox" id="sc3" /><label for="sc3"><strong>Relevance：</strong>全程圍繞「向病人推廣產品」；使用 annotations</label></li>
+            <li><input type="checkbox" id="sc4" /><label for="sc4"><strong>口語：</strong>清楚、節奏穩、音量夠、有自信；少 filler、少猶豫感</label></li>
+            <li><input type="checkbox" id="sc5" /><label for="sc5"><strong>互動感：</strong>自然說、勿照念；對<strong>鏡頭</strong>眼神接觸；有意圖的手勢</label></li>
+            <li><input type="checkbox" id="sc6" /><label for="sc6"><strong>≤ 3 分鐘</strong></label></li>
+            <li><input type="checkbox" id="sc7" /><label for="sc7"><strong>視覺：</strong>圖表標籤清楚；流程圖簡潔；留白；字級／樣式一致；少塞字</label></li>
+          </ol>
+        </div>
+        <p class="tip-box"><strong>過關提示：</strong>技術內容要翻成病人聽得懂的話；Mahara 放影片＋符合模板，Moodle 也要交。</p>
+      </article>
+
+      <!-- 3 Leadership -->
+      <article class="skill-card" id="sk-lead">
+        <header>
+          <h3>Team Leadership</h3>
+          <span class="badge">Application</span>
+          <span class="badge group">組＋個人段落</span>
+        </header>
+        <dl class="skill-meta">
+          <div><dt>必須產出</dt><dd>Team charter（課堂模板＋全員簽名）、Skills matrix（同 Y1）、兩段個人 Controversy with Civility</dd></div>
+          <div><dt>個人字數</dt><dd>流程說明 50–100 字<strong>或</strong> 1 分鐘影音；成效反思同樣 50–100 字或 1 分鐘影音</dd></div>
+        </dl>
+        <div class="checklist">
+          <ol>
+            <li><input type="checkbox" id="tl1" /><label for="tl1"><strong>Team charter（組）：</strong>目標與期望、公平分工、誤期／不均貢獻怎麼辦、溝通方式、意見不合時如何決策、全員審閱並簽名（用講義模板）</label></li>
+            <li><input type="checkbox" id="tl2" /><label for="tl2"><strong>Skills matrix（組）：</strong>每人技術／非技術技能、知識缺口、如何影響分工、是否人人有貢獻機會、發展新技能機會（完成方式同 Y1）→ 模板 <a href="qms/Human%20resources/PW1_Skills_Matrix.xlsx">qms/Human resources/PW1_Skills_Matrix.xlsx</a>（說明 <a href="qms/Human%20resources/README_Skills_Matrix.md">README</a>）</label></li>
+            <li><input type="checkbox" id="tl3" /><label for="tl3"><strong>Controversy with Civility 流程（個人）：</strong>說明已採哪些流程（50–100 字或 1 分鐘影音）；對照講義相關流程</label></li>
+            <li><input type="checkbox" id="tl4" /><label for="tl4"><strong>成效反思（個人）：</strong>是否敢發言、爭執是否有效解決、決策是否更好、有無漏觀點、未來改什麼（50–100 字或 1 分鐘影音）</label></li>
+          </ol>
+        </div>
+        <p class="tip-box"><strong>過關提示：</strong>簽名與 matrix 缺一不可；兩段個人文字／影音分開寫，勿抄組員。</p>
+      </article>
+
+      <!-- 4 PM -->
+      <article class="skill-card" id="sk-pm">
+        <header>
+          <h3>Advanced project management</h3>
+          <span class="badge">Application</span>
+          <span class="badge group">組 · Mahara 欄位</span>
+        </header>
+        <dl class="skill-meta">
+          <div><dt>必須產出</dt><dd>Mahara 已開好欄位：Aims、Scope、Objectives、Work packages、Tasks、Milestones、Deliverables</dd></div>
+          <div><dt>字數</dt><dd>Aims／Scope 各 50–100 字；每個 Objective 20–50 字且含 SMART；≥2 個 WP</dd></div>
+        </dl>
+        <div class="checklist">
+          <ol>
+            <li><input type="checkbox" id="pm1" /><label for="pm1"><strong>Aims（50–100 字）：</strong>專案整體目的——技術目標＋更廣的教育目標</label></li>
+            <li><input type="checkbox" id="pm2" /><label for="pm2"><strong>Scope（50–100 字）：</strong>邊界——時間限制、可用材料範圍等；官方模板文字舉了「race track／mouse」例（其他 PW 殘留），本週應改寫為本專案邊界（kit、任務、截止）。若附圖，需 caption 並在正文引用</label></li>
+            <li><input type="checkbox" id="pm3" /><label for="pm3"><strong>Objectives：</strong>≥2 個；每個 20–50 字內寫全 SMART（Specific, Measurable, Achievable, Relevant, Time-bound）</label></li>
+            <li><input type="checkbox" id="pm4" /><label for="pm4"><strong>Work packages：</strong>腦力激盪大任務→拆子任務→歸成 ≥2 個 WP；短標題＋簡短摘要</label></li>
+            <li><input type="checkbox" id="pm5" /><label for="pm5"><strong>Tasks：</strong>每任務有標題＋簡述（可用條列）；寫依賴與估時；各 WP 內依時間排序</label></li>
+            <li><input type="checkbox" id="pm6" /><label for="pm6"><strong>Milestones：</strong>重大節點；綁定所屬 WP；給目標日與時間（對齊週一 kit／週四 audit／週五 full adder 等）</label></li>
+            <li><input type="checkbox" id="pm7" /><label for="pm7"><strong>Deliverables：</strong>每任務輸出用短語描述，並列所屬 WP</label></li>
+          </ol>
+        </div>
+        <p class="tip-box"><strong>過關提示：</strong>七欄都填；Objectives 要看得出 SMART；例子中的賽道／滑鼠請換成電晶體週實際交付。</p>
+      </article>
+
+      <!-- 5 Time -->
+      <article class="skill-card" id="sk-time">
+        <header>
+          <h3>Advanced time management</h3>
+          <span class="badge">Application</span>
+          <span class="badge group">組 · Mahara 模板</span>
+        </header>
+        <dl class="skill-meta">
+          <div><dt>必須產出</dt><dd>GANTT（含並行／工時）、標色 critical path(s)、緩衝配置、作品集前三大排程風險</dd></div>
+          <div><dt>字數</dt><dd>Top 3 risks：組內討論後寫入 portfolio，<strong>50–100 字</strong></dd></div>
+        </dl>
+        <div class="checklist">
+          <ol>
+            <li><input type="checkbox" id="tm1" /><label for="tm1">拆成獨立任務；組員各自估時再比對（可用 PERT，見講義）</label></li>
+            <li><input type="checkbox" id="tm2" /><label for="tm2">決定組內可工作時段／可用人力</label></li>
+            <li><input type="checkbox" id="tm3" /><label for="tm3">標出可並行任務；畫完整 GANTT</label></li>
+            <li><input type="checkbox" id="tm4" /><label for="tm4">找出 critical path（可能多條——例如準時交付簡報／pitch、QMS 就緒）；超時則砍非必要、重分配或提早開工</label></li>
+            <li><input type="checkbox" id="tm5" /><label for="tm5">Critical path(s) 在 GANTT 上用<strong>不同顏色</strong>清楚標出</label></li>
+            <li><input type="checkbox" id="tm6" /><label for="tm6">關鍵路徑上高風險任務優先；決定任務緩衝 vs 專案末緩衝；避開講義提到的緩衝誤用陷阱</label></li>
+            <li><input type="checkbox" id="tm7" /><label for="tm7">腦力激盪排程風險（likelihood × severity）；作品集討論<strong>前三大風險（50–100 字）</strong></label></li>
+          </ol>
+        </div>
+        <p class="tip-box"><strong>過關提示：</strong>沒有「上色的 critical path」與「三大風險短文」很容易被視為未完成。</p>
+        <p class="tip-box" style="margin-top:0.65rem"><strong>可交主檔：</strong>打開 <a href="qms/Operations/PW1_TM_SUBMIT.html"><code>qms/Operations/PW1_TM_SUBMIT.html</code></a>（黃色欄可改組員／風險 → 列印 PDF／截 GANTT）。教學頁：<a href="qms/Operations/PW1_Time_Management.html">零基礎說明</a>。附檔：<a href="qms/Operations/PW1_TM_Mahara_Paste.md">Mahara 貼文</a>、<a href="qms/Operations/PW1_GANTT_tasks.csv">任務 CSV</a>、<a href="qms/Operations/README_Time_Management.md">怎麼改怎麼交</a>。</p>
+      </article>
+
+      <!-- 6 QMS -->
+      <article class="skill-card" id="sk-qms">
+        <header>
+          <h3>Quality management system with change management</h3>
+          <span class="badge">Application</span>
+          <span class="badge group">組＋個人 CI</span>
+        </header>
+        <dl class="skill-meta">
+          <div><dt>必須產出</dt><dd>ISO 9001 風格 QMS 資料夾樹、命名程序 Word、Gallery Excel、D&amp;D traceability（至 verification）、個人 CI 50–100 字、GitHub branch→merge 證據</dd></div>
+          <div><dt>現場</dt><dd>周四 11:15 Audit：30 秒內找到被點名文件</dd></div>
+        </dl>
+        <div class="qms-tree" style="margin:0.5rem 0 1rem">QMS/
+├── Quality documents/
+│   ├── Quality manual/     ← 組織品質承諾文件
+│   ├── Procedure/          ← 至少：檔名命名程序
+│   └── Forms/              ← 可空
+├── Quality control/        ← 測試定義與結果
+├── Engineering/            ← 電路／程式等；Traceability matrix 在此
+├── Operations/             ← 至少：時間管理計畫
+├── Purchasing/             ← 本 PW 空
+├── Sales/customer service/ ← 客戶相關
+├── Human resources/        ← 團隊文件
+└── Documents gallery/      ← 唯一：全檔案清單 Excel</div>
+        <div class="checklist">
+          <ol>
+            <li><input type="checkbox" id="qm1" /><label for="qm1">建立上方完整資料夾樹，文件放對位置</label></li>
+            <li><input type="checkbox" id="qm2" /><label for="qm2"><strong>命名程序 Word</strong>→ Procedure：涵蓋版本控制、易找、全員能懂；定義並解釋 naming convention（講義有範例）</label></li>
+            <li><input type="checkbox" id="qm3" /><label for="qm3"><strong>Documents gallery Excel</strong>：QMS 內<strong>所有</strong>檔名＋路徑（此資料夾只放這份清單）</label></li>
+            <li><input type="checkbox" id="qm4" /><label for="qm4"><strong>Traceability matrix</strong>（Engineering）：D&amp;D 做到 <strong>verification</strong> 欄即可（同 Y1 Synthesis）</label></li>
+            <li><input type="checkbox" id="qm5" /><label for="qm5"><strong>持續改善（個人 50–100 字）：</strong>選講義一種 CI 方法；說明如何提升品質／效率／參與／客戶滿意</label></li>
+            <li><input type="checkbox" id="qm6" /><label for="qm6"><strong>GitHub：</strong>展示建 branch → 修改 → merge 回 main（可貼連結）</label></li>
+            <li><input type="checkbox" id="qm7" /><label for="qm7">週四稽核前演練：任意抽一份程序／紀錄，30 秒內打開</label></li>
+          </ol>
+        </div>
+        <p class="tip-box"><strong>過關提示：</strong>樹對＋找得快比「寫很長」更重要；Gallery 必須完整；CI 與 Git 證據常被漏交。</p>
+      </article>
+    </section>
+
+    <!-- Task 1 -->
+    <section class="block" id="task1">
+      <p class="block-label">04 · Lab Task 1</p>
+      <h2>電晶體基礎（面向非技術觀眾）</h2>
+      <p class="lede">研究並簡報 BJT 與 MOSFET。禁止未解釋的術語與縮寫。</p>
+
+      <details class="faq" open>
+        <summary>半導體為什麼比單純導體更有用？</summary>
+        <p>導體電流幾乎「一直通」；半導體的導電能力可以被刻意調控——這才讓開關與放大成為可能。</p>
+      </details>
+      <details class="faq">
+        <summary>摻雜（doping）做了什麼？</summary>
+        <ul>
+          <li><strong>N 型</strong>：多電子（負載子）</li>
+          <li><strong>P 型</strong>：多電洞（正載子）</li>
+          <li>PN 接面會形成空乏區與內建電場</li>
+        </ul>
+      </details>
+      <details class="faq">
+        <summary>BJT 記住什麼？</summary>
+        <ul>
+          <li>三區：Emitter／Base／Collector（NPN 或 PNP）</li>
+          <li>小的基極電流可控制較大的集極電流 → 開關或放大器</li>
+          <li>弄清操作模式與 NPN／PNP 使用情境</li>
+          <li>各區摻雜濃度與物理尺寸為何不同？這決定電流增益</li>
+        </ul>
+      </details>
+      <details class="faq">
+        <summary>MOSFET 記住什麼？</summary>
+        <ul>
+          <li>三端：Source／Drain／Gate；閘極與通道間有絕緣層</li>
+          <li>用<strong>電場</strong>（閘極電壓）控制通道是否導電；超過臨界電壓後通道變強導電</li>
+          <li>相對 BJT 的優缺點、用來分類效能的關鍵參數</li>
+        </ul>
+      </details>
+
+      <div class="callout">
+        <p><strong>簡報提示：</strong>用比喻（水龍頭／閘門）講「小訊號控大電流／電場開通道」，再接到日常裝置（手機、電腦）裡成千上萬顆開關。</p>
+      </div>
+    </section>
+
+    <!-- Task 2 -->
+    <section class="block" id="task2">
+      <p class="block-label">05 · Lab Task 2</p>
+      <h2>輸入／輸出特性：量測與意義</h2>
+      <p class="lede">實驗或模擬皆可。先看 datasheet，確認腳位與最大電壓／電流。BJT 用 Common Emitter。</p>
+
+      <p style="margin-bottom:0.5rem"><a href="https://docs.rs-online.com/fec6/0900766b81384356.pdf" target="_blank" rel="noopener">BJT Datasheet（RS）</a></p>
+
+      <h3 style="margin:1.25rem 0 0.5rem;font-size:1.05rem">BJT 輸入特性</h3>
+      <div class="steps">
+        <div class="step">
+          <h3>固定 <span class="mono">V<sub>CE</sub></span>，掃 <span class="mono">V<sub>BE</sub></span></h3>
+          <p>量 <span class="mono">I<sub>B</sub></span> vs <span class="mono">V<sub>BE</sub></span>。矽管建議用足夠大的 <span class="mono">V<sub>CE</sub></span>（教材示例約 5–10 V 量級，以腳本為準）讓 BC 接面維持合適偏壓。</p>
+        </div>
+        <div class="step">
+          <h3>實作細節</h3>
+          <ul>
+            <li>示波器當電壓表、三用電表當電流表（需同時讀）</li>
+            <li>固定一組 <span class="mono">V<sub>CE</sub></span>，把供應從約 1 V 調到 15 V，記錄 <span class="mono">I<sub>B</sub></span>、<span class="mono">V<sub>BE</sub></span></li>
+            <li>再換另外 2 組 <span class="mono">V<sub>CE</sub></span> 重做；畫 <span class="mono">I<sub>B</sub></span>–<span class="mono">V<sub>BE</sub></span></li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin:1.5rem 0 0.5rem;font-size:1.05rem">BJT 輸出特性</h3>
+      <div class="steps">
+        <div class="step">
+          <h3>固定 <span class="mono">I<sub>B</sub></span>，掃 <span class="mono">V<sub>CE</sub></span></h3>
+          <ul>
+            <li>用輸入特性結果選合適的 <span class="mono">I<sub>B</sub></span></li>
+            <li><span class="mono">V<sub>CE</sub></span> 約 0.1–5 V；低壓區多取點以看飽和</li>
+            <li>至少 3 條不同 <span class="mono">I<sub>B</sub></span> 的 <span class="mono">I<sub>C</sub></span>–<span class="mono">V<sub>CE</sub></span> 曲線</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin:1.5rem 0 0.5rem;font-size:1.05rem">MOSFET</h3>
+      <div class="grid-2">
+        <div class="panel">
+          <h3>輸出（Drain）特性</h3>
+          <p>固定 <span class="mono">V<sub>GS</sub></span>（例：先調到約 4 V 相關條件），掃 <span class="mono">V<sub>DS</sub></span>：電流變恆定前每 0.2 V，之後每 1 V 至約 15 V。至少 3 組 <span class="mono">V<sub>GS</sub></span>。</p>
+        </div>
+        <div class="panel">
+          <h3>轉移特性</h3>
+          <p>固定 <span class="mono">V<sub>DS</sub></span>，掃 <span class="mono">V<sub>GS</sub></span>；畫 <span class="mono">I<sub>D</sub></span>–<span class="mono">V<sub>GS</sub></span>（多條 <span class="mono">V<sub>DS</sub></span>）。</p>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:1rem">
+        <h3>一定要算／講的兩個 MOSFET 指標</h3>
+        <ul>
+          <li><strong>ON/OFF ratio</strong>：同一 <span class="mono">V<sub>DS</sub></span> 下 <span class="mono">I<sub>on</sub>/I<sub>off</sub></span>。越大，當開關越不容易「假導通」。</li>
+          <li><strong>Transconductance（g<sub>m</sub>）</strong>：轉移曲線最大斜率——與載子遷移率／開關速度與效率相關（完整 μ 公式需 W、L；封裝管先報 g<sub>m</sub>）。</li>
+        </ul>
+      </div>
+
+      <div class="callout">
+        <p><strong>簡報怎麼說人話：</strong>這些曲線告訴我們「多大力氣才能打開開關、打開後電流多穩、開關有多乾淨」。邏輯閘與電腦都建立在「可靠的 0／1」之上。</p>
+      </div>
+    </section>
+
+    <!-- Task 3 -->
+    <section class="block" id="task3">
+      <p class="block-label">06 · Lab Task 3</p>
+      <h2>邏輯閘：把電晶體串成規則</h2>
+      <p class="lede">邏輯閘：若干輸入 → 依規則給輸出。請實作並驗證真值表；思考為何這種接法需要「好的」輸出特性。</p>
+
+      <div class="grid-2">
+        <div class="panel"><h3>NOT（Inverter）</h3><p>輸入 0→輸出 1；反之亦然。數位系統的基本「翻轉」。</p></div>
+        <div class="panel"><h3>AND</h3><p>全部輸入為 1 才輸出 1。</p></div>
+        <div class="panel"><h3>OR</h3><p>任一輸入為 1 即輸出 1。</p></div>
+        <div class="panel"><h3>XOR</h3><p>輸入相異為 1；相同為 0——半加器的 Sum。</p></div>
+      </div>
+
+      <div class="steps" style="margin-top:1.25rem">
+        <div class="step">
+          <h3>建議驗證方式</h3>
+          <p>按鈕當輸入、LED 當輸出，逐列核對真值表。</p>
+        </div>
+        <div class="step">
+          <h3>延伸</h3>
+          <ul>
+            <li>串出 3 輸入 AND</li>
+            <li>XOR 再接 NOT → XNOR</li>
+            <li>簡報中示範「電晶體如何促成閘功能」</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Task 4 -->
+    <section class="block" id="task4">
+      <p class="block-label">07 · Lab Task 4</p>
+      <h2>半加器與全加器</h2>
+      <p class="lede">電腦用二進位加法。Half adder 加兩位元；Full adder 加三位元（含進位），可串成多位元加法器。</p>
+
+      <h3 style="margin:1rem 0 0.5rem;font-size:1.05rem">Half adder 真值表</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>A</th><th>B</th><th>Carry</th><th>Sum</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+            <tr><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--ink-soft);font-size:0.92rem;margin-bottom:1rem">Sum = XOR(A,B)；Carry = AND(A,B)。教材電晶體級電路可能用較多顆電晶體以改善訊號還原與可靠度。</p>
+
+      <h3 style="margin:1rem 0 0.5rem;font-size:1.05rem">Full adder 真值表</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>A</th><th>B</th><th>Cin</th><th>Carry</th><th>Sum</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+            <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+            <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+            <tr><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+            <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <h3>組裝策略</h3>
+          <p>兩個 half adder 串接，再處理進位合併（課堂邏輯圖）。週五找另一組已完成的 half adder 合體。</p>
+        </div>
+        <div class="step">
+          <h3>挑戰</h3>
+          <p>兩個 full adder 可朝 4-bit 加法邁進——展示「小閘 → 運算單元」的擴展。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deliverables -->
+    <section class="block" id="deliverables">
+      <p class="block-label">08 · Checklist</p>
+      <h2>本週繳交／現場檢查清單</h2>
+      <p class="lede">勾選進度（僅存在此瀏覽器本機）。建議週三前完成技術主線，週四專攻 QMS＋影片。</p>
+
+      <ul class="checklist" id="final-check">
+        <li><input type="checkbox" id="d1" /><label for="d1">Task 1 非技術簡報素材就緒<small>BJT／MOSFET 結構、特性、應用</small></label></li>
+        <li><input type="checkbox" id="d2" /><label for="d2">Task 2 曲線與參數<small>BJT 輸入輸出、MOSFET 輸出／轉移、ON/OFF、g<sub>m</sub></small></label></li>
+        <li><input type="checkbox" id="d3" /><label for="d3">Task 3 四閘真值表驗證通過</label></li>
+        <li><input type="checkbox" id="d4" /><label for="d4">Task 4 Half adder 可演示</label></li>
+        <li><input type="checkbox" id="d5" /><label for="d5">團隊簡報（非技術觀眾）整合量測與電路</label></li>
+        <li><input type="checkbox" id="d6" /><label for="d6">QMS 樹＋命名程序＋Gallery Excel＋Traceability＋CI＋Git 證據</label></li>
+        <li><input type="checkbox" id="d7" /><label for="d7">六項技能 Mahara 模板勾完<small>詳見 <a href="#skills">#skills</a> 或 <a href="skills-checklist.html">skills-checklist.html</a></small></label></li>
+        <li><input type="checkbox" id="d8" /><label for="d8">個人 3 分鐘影片上傳 Moodle（周四結束前）＋Mahara</label></li>
+        <li><input type="checkbox" id="d9" /><label for="d9">週五 Full adder 合體＋Kit 歸還</label></li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>來源：</strong>已對照官方 skills 頁全文整理。截圖備份於 <span class="mono">assets/sustainability-skills-fullpage.png</span>。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    University of Bath · Year 2 Project Weeks · PW1 Transistors 教學整理頁（非官方）。以 Moodle／課程頁最終規定為準。
+  </footer>
+
+  <script>
+    (function () {
+      const bar = document.getElementById("progress");
+      const links = [...document.querySelectorAll("#toc a")];
+      const sections = links.map((a) => document.querySelector(a.getAttribute("href"))).filter(Boolean);
+
+      function onScroll() {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = max > 0 ? (window.scrollY / max) * 100 + "%" : "0%";
+        let current = sections[0];
+        for (const s of sections) {
+          if (s.getBoundingClientRect().top <= 96) current = s;
+        }
+        links.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + current.id));
+      }
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+
+      const KEY = "pw1-transistor-checks";
+      function load() {
+        try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; }
+      }
+      function save(state) {
+        localStorage.setItem(KEY, JSON.stringify(state));
+      }
+      const state = load();
+      document.querySelectorAll('.checklist input[type="checkbox"]').forEach((el) => {
+        if (state[el.id]) el.checked = true;
+        el.addEventListener("change", () => {
+          state[el.id] = el.checked;
+          save(state);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
